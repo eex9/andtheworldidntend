@@ -1,6 +1,7 @@
 import marko
 import pdfkit
 import os
+import json
 from pypdf import PdfMerger
 
 def markdown_to_html(path:str) -> str:
@@ -47,8 +48,13 @@ def merge_pdfs_from_html_onepage(html1:str, html2:str, path) -> None:
     pdfkit.from_string(html, path, options={"enable-local-file-access": ""})
 
 def main():
-    # Pages goes in order - code formats it correctly (hopefully)
-    pages = ("front_cover.md", "foreword.md", "this_body_is_not_mine.md") 
+    with open("./page_order.json", "r") as config:
+        config_file = json.load(config)
+        pages:list = config_file.get("order", None)
+        if pages == None:
+            print("Could not load config. Exiting...")
+            exit()
+    
     html = list(markdown_to_html(f"./zine_pages/md/{page}") for page in pages)
     for i in range(len(pages)):
         try:

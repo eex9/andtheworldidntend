@@ -1,8 +1,8 @@
 {
-    "order": {
-        "front": "front_cover",
-        "1": "foreword",
-        "2": "this_body_is_not_mine",
-        
-    }
+    "order": [
+        "front_cover",
+        "foreword",
+        "this_body_is_not_mine",
+        "back_cover"
+    ]
 }
