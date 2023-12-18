@@ -68,6 +68,11 @@ def main():
         except OSError:
             print(f"Could not convert file ./zine_pages/html/{pages[i].split('/')[-1][:pages[i].rindex('.')]}.html to pdf format:\nFile might have links")
     
+    print("Please check over all files and ensure they fit on one page. PDFs will be updated from HTML upon continue.")
+    input("Press enter when ready. Press CTRL+C to exit.")
+    for i in range(len(pages)):
+        pdfkit.from_file(f"./zine_pages/html/{pages[i].split('/')[-1][:pages[i].rindex('.')]}.html", f"./zine_pages/pdf/single_pages/{pages[i].split('/')[-1][:pages[i].rindex('.')]}.pdf")
+    
     if (len(html)%2!=0):
         html.insert(-1, "")
     for i in range(int(len(html)/2)):
@@ -76,7 +81,7 @@ def main():
     for pdf in os.listdir("./zine_pages/pdf/full_pages"):
         merger.append(f"./zine_pages/pdf/full_pages/{pdf}")
     merger.write("./zine_pages/pdf/full.pdf")
-    merger.close
+    merger.close()
 
 def test():
     with open(f"./zine_pages/html/test.html", "+w") as file:
