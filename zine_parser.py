@@ -16,7 +16,7 @@ def markdown_to_html(path:str) -> str:
             if not reading:
                 if (line == "---\n"):
                     reading = True
-                    out = f"# {title if title != None else ''}\n{'By', author if author != None else ''}\n"
+                    out = f"# {title if title != None else ''}\n{f'By {author}' if author != None else ''}\n"
                     continue
                 elif (line.startswith("author:")):
                     line = line.removeprefix("author: ")
@@ -29,7 +29,7 @@ def markdown_to_html(path:str) -> str:
                     reading = False
                     continue
                 out += f"{line}\n"
-    return f'<style>\n.column{{\nfloat: left;\nwidth: 50%;\n}}\n</style>\n{marko.convert(out)}'
+    return f'{marko.convert(out)}'
 
 def html_to_pdf(html:str, path:str) -> None:
     pdfkit.from_string(html, path, options={"enable-local-file-access": ""})
@@ -84,8 +84,12 @@ def main():
     merger.close()
 
 def test():
-    with open(f"./zine_pages/html/test.html", "+w") as file:
-        file.write(markdown_to_html("./zine_pages/md/test.md"))
+    pages = ("history_page_1.md", "history_page_2.md", "organizing_and_direct_action.md")
+    html = list(markdown_to_html(f"andtheworldidntend/zine_pages/md/{page}") for page in pages)
+    for i in range(len(pages)):
+        with open(f"andtheworldidntend/zine_pages/html/{pages[i].split('/')[-1][:pages[i].rindex('.')]}.html", "x") as file:
+            file.write(html[i])
+        html_to_pdf(html[i], f"andtheworldidntend/zine_pages/pdf/single_pages/{pages[i].split('/')[-1][:pages[i].rindex('.')]}.pdf")
 
 if __name__ == "__main__":
-    main()
+    test()

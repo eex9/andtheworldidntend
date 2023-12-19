@@ -1,21 +1,37 @@
 {
     "order": [
         "front_cover",
+
         "foreword",
         "this_body_is_not_mine",
+        
         "misc_defs_page_1",
         "misc_defs_page_2",
+        
         "tincture",
         "page_6",
+        
         "down_the_winding_road_part_1",
         "fruit_salad",
+        
         "transcendental_youth_page_1",
         "transcendental_youth_page_2",
+        
         "werewolf_facts",
         "prayers",
+        
         "down_the_winding_road_part_2",
         "ways_to_come_out",
+        
         "things_that_are_trans",
+        "organizing_and_direct_action",
+        
+        "history_page_1",
+        "history_page_2",
+
+        "agate",
+        "down_the_winding_road_part_3",
+        
         "back_cover"
     ]
 }
