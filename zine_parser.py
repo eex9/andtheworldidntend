@@ -16,7 +16,7 @@ def markdown_to_html(path:str) -> str:
             if not reading:
                 if (line == "---\n"):
                     reading = True
-                    out = f"# {title if title != None else 'Untitled'}\nBy {author if author != None else 'Anonymous'}\n"
+                    out = f"# {title if title != None else ''}\n{'By', author if author != None else ''}\n"
                     continue
                 elif (line.startswith("author:")):
                     line = line.removeprefix("author: ")
