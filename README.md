@@ -1,6 +1,6 @@
 # And the World Didn't End
 
-Archive for past publications and repo for code aspects of the zine.
+Archive for [past publications](#archival) and repo for [code aspects](#file-structure) of the zine.
 
 Read [the foreword](./zine_pages/md/foreword.md) for more information.
 
