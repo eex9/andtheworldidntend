@@ -84,12 +84,7 @@ def main():
     merger.close()
 
 def test():
-    pages = ("history_page_1.md", "history_page_2.md", "organizing_and_direct_action.md")
-    html = list(markdown_to_html(f"andtheworldidntend/zine_pages/md/{page}") for page in pages)
-    for i in range(len(pages)):
-        with open(f"andtheworldidntend/zine_pages/html/{pages[i].split('/')[-1][:pages[i].rindex('.')]}.html", "x") as file:
-            file.write(html[i])
-        html_to_pdf(html[i], f"andtheworldidntend/zine_pages/pdf/single_pages/{pages[i].split('/')[-1][:pages[i].rindex('.')]}.pdf")
+    import this
 
 if __name__ == "__main__":
-    test()
+    main()
