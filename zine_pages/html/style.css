@@ -1,0 +1,9 @@
+h4 {
+    margin-top: .67em;
+    margin-bottom: .67em;
+}
+
+.column {
+    float: left;
+    width: 50%;
+}

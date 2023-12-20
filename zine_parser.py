@@ -2,10 +2,11 @@ import marko
 import pdfkit
 import os
 import json
-from pathlib import Path
-from pypdf import PdfMerger
+from pypdf import PdfWriter
 
-def markdown_to_html(path:str|Path) -> str:
+dirname = os.path.dirname(__file__)
+
+def markdown_to_html(path:str) -> str:
     author = None
     title = None
     reading = True
@@ -32,60 +33,58 @@ def markdown_to_html(path:str|Path) -> str:
                 out += f"{line}\n"
     return f'{marko.convert(out)}'
 
-def html_to_pdf(html:str, path:str|Path) -> None:
-    pdfkit.from_string(html, path, options={"enable-local-file-access": ""})
+def html_to_pdf(html:str, path:str) -> None:
+    pdfkit.from_string(html, path, css=f"{dirname}/zine_pages/html/style.css")
 
-# this method sucks but i dont feel like writing it any other way rn. someone else do it
 def merge_html_onepage(html1:str, html2:str) -> str:
-    out = '<style>.column {float: left;width: 50%;}</style>\n"<div class="row">\n<div class="column">'
-    out += html1.strip(".column{ float: left; width: 50%; }")
-    out += '</div>\n<div class="column">'
-    out += html2.strip(".column{ float: left; width: 50%; }")
-    out += '</div>\n</div>'
-    return out
+    return f'<div class="row">\n<div class="column">{html1}</div>\n<div class="column">{html2}</div>\n</div>'
 
-def merge_pdfs_from_html_onepage(html1:str, html2:str, path:str|Path) -> None:
+def merge_pdfs_from_html_onepage(html1:str, html2:str, path) -> None:
     html = merge_html_onepage(html1, html2)
-    pdfkit.from_string(html, path, options={"enable-local-file-access": ""})
+    pdfkit.from_string(html, path, options={"orientation": "landscape"}, css=f"{dirname}/zine_pages/html/style.css")
 
 def main():
-    with open(Path()/"page_order.json", "r") as config:
+    with open(f"{dirname}/page_order.json", "r") as config:
         config_file = json.load(config)
         pages:list = config_file.get("order", None)
         if pages == None:
             print("Could not load config. Exiting...")
             exit()
     
-    html = list(markdown_to_html(Path()/"zine_pages"/"md"/page) for page in pages)
+    html = list(markdown_to_html(f"{dirname}/zine_pages/md/{page}.md") for page in pages)
     for i in range(len(pages)):
         try:
-            with open(Path()/"zine_pages"/"html"/f"{pages[i].split('/')[-1][:pages[i].rindex('.')].html}", "x") as file:
+            with open(f"{dirname}/zine_pages/html/{pages[i].split('/')[-1]}.html", "x") as file:
                 file.write(html[i])
         except FileExistsError:
-            print(f"Could not overwrite file: ./zine_pages/html/{pages[i].split('/')[-1][:pages[i].rindex('.')]}.html")
+            print(f"Could not overwrite file: {dirname}/zine_pages/html/{pages[i].split('/')[-1]}.html")
             continue
         try:
-            html_to_pdf(html[i], Path()/"zine_pages"/"pdf"/"single_pages"/f"{pages[i].split('/')[-1][:pages[i].rindex('.')]}.pdf")
+            html_to_pdf(html[i], f"{dirname}/zine_pages/pdf/single_pages/{pages[i].split('/')[-1]}.pdf")
         except OSError:
-            print(f"Could not convert file ./zine_pages/html/{pages[i].split('/')[-1][:pages[i].rindex('.')]}.html to pdf format:\nFile might have links")
+            print(f"Could not convert file {dirname}/zine_pages/html/{pages[i].split('/')[-1]}.html to pdf format:\nFile might have links")
     
     print("Please check over all files and ensure they fit on one page. PDFs will be updated from HTML upon continue.")
     input("Press enter when ready. Press CTRL+C to exit.")
     for i in range(len(pages)):
-        pdfkit.from_file(Path()/"zine_pages"/"html"/f"{pages[i].split('/')[-1][:pages[i].rindex('.')]}.html", Path()/"zine_pages"/"pdf"/"single_pages"/f"{pages[i].split('/')[-1][:pages[i].rindex('.')]}.pdf")
+        pdfkit.from_file(f"{dirname}/zine_pages/html/{pages[i].split('/')[-1]}.html", f"{dirname}/zine_pages/pdf/single_pages/{pages[i].split('/')[-1]}.pdf")
     
     if (len(html)%2!=0):
         html.insert(-1, "")
     for i in range(int(len(html)/2)):
-        merge_pdfs_from_html_onepage(html[i], html[len(html)-i-1], Path()/"zine_pages"/"pdf"/"full_pages"/f"page_{i+1}.pdf")
-    merger = PdfMerger()
-    for pdf in os.listdir(Path()/"zine_pages"/"pdf"/"full_pages"):
-        merger.append(Path()/"zine_pages"/"pdf"/"full_pages"/pdf)
-    merger.write(Path()/"zine_pages"/"pdf"/"full.pdf")
+        if (i % 2 == 1):
+            merge_pdfs_from_html_onepage(html[i], html[len(html)-i-1], f"{dirname}/zine_pages/pdf/full_pages/page_{i+1}.pdf")
+        else:
+            merge_pdfs_from_html_onepage(html[len(html)-i-1], html[i], f"{dirname}/zine_pages/pdf/full_pages/page_{i+1}.pdf")
+    merger = PdfWriter()
+    for pdf in os.listdir(f"{dirname}/zine_pages/pdf/full_pages"):
+        merger.append(f"{dirname}/zine_pages/pdf/full_pages/{pdf}")
+    merger.write(f"{dirname}/zine_pages/pdf/full.pdf")
     merger.close()
 
 def test():
-    import this
+    with open(f"{dirname}/zine_pages/md/organizing_and_direct_action.md") as file:
+        print(file.readlines())
 
 if __name__ == "__main__":
     main()
